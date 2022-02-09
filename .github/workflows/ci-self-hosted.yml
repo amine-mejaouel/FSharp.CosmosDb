@@ -1,4 +1,4 @@
-name: CI build
+name: CI build selfhosted
 
 env:
   OUTPUT_PATH: ${{ github.workspace }}/.nupkg
