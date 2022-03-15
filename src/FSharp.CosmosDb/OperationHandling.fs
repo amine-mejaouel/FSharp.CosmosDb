@@ -67,6 +67,22 @@ let execQueryBatch (getClient: ConnectionOperation -> CosmosClient) (op: QueryOp
     | None ->
         failwith "Unable to construct a query as some values are missing across the database, container name and query"
 
+let execCreateDatabase (getClient: ConnectionOperation -> CosmosClient) (op: CreateDatabaseOp) =
+    let connInfo = op.Connection
+    let client = getClient connInfo
+    
+    let result =
+        maybe {
+            let! database = connInfo.DatabaseId
+            
+            return client.CreateDatabaseAsync(database)
+            |> Async.AwaitTask
+        }
+        
+    match result with
+    | Some result -> result
+    | None -> failwith "cannot create database"
+    
 let execInsert (getClient: ConnectionOperation -> CosmosClient) (op: InsertOp<'T>) =
     let connInfo = op.Connection
     let client = getClient connInfo
@@ -189,7 +205,7 @@ let execUpdate (getClient: ConnectionOperation -> CosmosClient) (op: UpdateOp<'T
 
     | None -> failwith "Unable to read from the container to get the item for updating"
 
-let execDelete (getClient: ConnectionOperation -> CosmosClient) (op: DeleteOp<'T>) =
+let execDeleteItem (getClient: ConnectionOperation -> CosmosClient) (op: DeleteItemOp<'T>) =
     let connInfo = op.Connection
     let client = getClient connInfo
 
@@ -216,7 +232,48 @@ let execDelete (getClient: ConnectionOperation -> CosmosClient) (op: DeleteOp<'T
         |> AsyncSeq.ofSeqAsync
 
     | None -> failwith "Unable to read from the container to get the item for updating"
+    
+let execDeleteContainer (getClient: ConnectionOperation -> CosmosClient) (op: DeleteContainerOp<'T>) =
+    let connInfo = op.Connection
+    let client = getClient connInfo
 
+    let result =
+        maybe {
+            let! databaseId = connInfo.DatabaseId
+            let! containerName = connInfo.ContainerName
+
+            let db = client.GetDatabase databaseId
+
+            let container = db.GetContainer containerName
+
+            return
+                container.DeleteContainerAsync ()
+                |> Async.AwaitTask
+        }
+
+    match result with
+    | Some result -> result
+    | None -> failwith "Unable to delete container"
+    
+let execDeleteDatabase (getClient: ConnectionOperation -> CosmosClient) (op: DeleteDatabaseOp) =
+    let connInfo = op.Connection
+    let client = getClient connInfo
+
+    let result =
+        maybe {
+            let! databaseId = connInfo.DatabaseId
+
+            let db = client.GetDatabase databaseId
+            
+            return
+                db.DeleteAsync()
+                |> Async.AwaitTask
+        }
+
+    match result with
+    | Some result -> result
+    | None -> failwith "Unable to delete database"
+    
 let execRead (getClient: ConnectionOperation -> CosmosClient) (op: ReadOp<'T>) =
     let connInfo = op.Connection
     let client = getClient connInfo

@@ -22,6 +22,36 @@ dotnet paket add FSharp.CosmosDb
 
 All operations will return an `AsyncSeq` via [FSharp.Control.AsyncSeq](http://fsprojects.github.io/FSharp.Control.AsyncSeq/index.html) that contains the data fetched, data inserted or data updated.
 
+### Create Database
+
+```fsharp
+open FSharp.CosmosDb
+
+let connStr = "..."
+
+let createDatabase =
+    connStr
+    |> Cosmos.fromConnectionString
+    |> Cosmos.database "MyDatabase"
+    |> Cosmos.createDatabase
+    |> Cosmos.execAsync
+```
+
+### Delete Database
+
+```fsharp
+open FSharp.CosmosDb
+
+let connStr = "..."
+
+let deleteDatabase =
+    connStr
+    |> Cosmos.fromConnectionString
+    |> Cosmos.database "MyDatabase"
+    |> Cosmos.deleteDatabase
+    |> Cosmos.execAsync
+```
+
 ### Insert
 
 ```fsharp
@@ -100,9 +130,9 @@ let main argv =
     } |> Async.RunSynchronously
 ```
 
-### Delete
+### DeleteItem
 
-```fsharp
+```f#
 open FSharp.CosmosDb
 
 let connStr = "..."
@@ -116,6 +146,19 @@ let updateUser id partitionKey =
     |> Cosmos.execAsync
 ```
 
+### DeleteContainer
+```f#
+open FSharp.CosmosDb
+
+let connStr = "..."
+
+connStr
+|> Cosmos.container "ContainerName"
+|> Cosmos.deleteContainer
+|> Cosmos.execAsync
+|> Async.Ignore
+```
+    
 # FSharp.CosmosDb.Analyzer 💡
 
 [![NuGet Badge - FSharp.CosmosDb](https://buildstats.info/nuget/FSharp.CosmosDb)](https://www.nuget.org/packages/FSharp.CosmosDb)
