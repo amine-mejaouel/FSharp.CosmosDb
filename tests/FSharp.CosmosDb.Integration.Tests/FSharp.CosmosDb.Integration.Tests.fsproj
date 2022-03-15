@@ -5,15 +5,13 @@
     <RootNamespace>FSharp.CosmosDb.Integration.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="paket.references" />
     <Compile Include="DatabaseTests.fs" />
     <Compile Include="ContainerTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FSharp.CosmosDb\FSharp.CosmosDb.fsproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="paket.references" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

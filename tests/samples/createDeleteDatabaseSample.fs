@@ -8,7 +8,7 @@ let createDatabase () =
     connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database "MyDatabase"
-    |> Cosmos.createDatabase
+    |> Cosmos.createDatabaseIfNotExists
     |> Cosmos.execAsync
     |> Async.RunSynchronously
 

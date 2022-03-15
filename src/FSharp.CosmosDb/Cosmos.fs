@@ -39,7 +39,7 @@ module Cosmos =
     let database dbId op = { op with DatabaseId = Some dbId }
 
     let container cn op = { op with ContainerName = Some cn }
-
+    
     // --- QUERY --- //
 
     let private defaultQueryOp () =
@@ -55,10 +55,14 @@ module Cosmos =
     let parameters arr op =
         { op with QueryOp.Parameters = op.Parameters @ arr }
         
-    // --- CREATE DATABASE --- //
+    // -- CHECK IF DATABASE EXISTS -- //
+    let checkIfDatabaseExists op =
+        { CheckIfDatabaseExistsOp.Connection = op }
+
+    // --- CREATE DATABASE IF NOT EXISTS --- //
         
-    let createDatabase op =
-        { CreateDatabaseOp.Connection = op }
+    let createDatabaseIfNotExists op =
+        { CreateDatabaseIfNotExistsOp.Connection = op }
 
     // --- INSERT --- //
 
@@ -235,7 +239,8 @@ module Cosmos =
 type Cosmos =
     static member private getClient (connInfo: ConnectionOperation) = connInfo.GetClient()
     static member execAsync (op: QueryOp<'T>) = OperationHandling.execQuery Cosmos.getClient op
-    static member execAsync op = OperationHandling.execCreateDatabase Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCheckIfDatabaseExists Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateDatabaseIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op

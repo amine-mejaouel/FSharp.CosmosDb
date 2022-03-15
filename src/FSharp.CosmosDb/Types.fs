@@ -87,7 +87,10 @@ type QueryOp<'T> =
       Query: string option
       Parameters: (string * obj) list }
     
-type CreateDatabaseOp =
+type CheckIfDatabaseExistsOp =
+    { Connection: ConnectionOperation }
+    
+type CreateDatabaseIfNotExistsOp =
     { Connection: ConnectionOperation }
 
 type InsertOp<'T> =
