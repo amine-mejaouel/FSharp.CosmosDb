@@ -2,34 +2,28 @@ module AnalyzerBootstrap
 
 open System
 open System.IO
-open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
 open FSharp.Analyzers.SDK
+open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.EditorServices
 
 let checker =
-    FSharpChecker.Create
-        (keepAllBackgroundResolutions = true, keepAssemblyContents = true, ImplicitlyStartBackgroundWork = true)
-
-let dumpOpts (opts: FSharpProjectOptions) =
-    printfn "FSharpProjectOptions.OtherOptions ->"
-    opts.OtherOptions |> Array.iter (printfn "%s")
+    FSharpChecker.Create(keepAllBackgroundResolutions = true, keepAssemblyContents = true)
 
 let loadProject file =
     async {
         let! source = IO.File.ReadAllTextAsync file |> Async.AwaitTask
-        let! (opts, error) = checker.GetProjectOptionsFromScript
-                                 (file, SourceText.ofString source, assumeDotNetFramework = false, useSdkRefs = true,
-                                  useFsiAuxLib = true, otherFlags = [| "--targetprofile:netstandard" |])
-        let newOO =
-            opts.OtherOptions
-            |> Array.map (fun i ->
-                if i.StartsWith("-r:") then
-                    let path = i.Split("-r:", StringSplitOptions.RemoveEmptyEntries).[0]
 
-                    sprintf "-r:%s" (IO.FileInfo(path).FullName)
-                else
-                    i)
-        // dumpOpts opts
+        let! (opts, error) =
+            checker.GetProjectOptionsFromScript(
+                file,
+                SourceText.ofString source,
+                assumeDotNetFramework = false,
+                useSdkRefs = true,
+                useFsiAuxLib = true,
+                otherFlags = [| "--targetprofile:netstandard" |]
+            )
+
         return file, opts
     }
     |> Async.RunSynchronously
@@ -37,21 +31,26 @@ let loadProject file =
 let typeCheckFile (file, opts) =
     let text = File.ReadAllText file
     let st = SourceText.ofString text
-    let (parseRes, checkAnswer) = checker.ParseAndCheckFileInProject(file, 1, st, opts) |> Async.RunSynchronously
+
+    let (parseRes, checkAnswer) =
+        checker.ParseAndCheckFileInProject(file, 1, st, opts)
+        |> Async.RunSynchronously
 
     match checkAnswer with
     | FSharpCheckFileAnswer.Aborted ->
-        printfn "Checking of file %s aborted because %A" file parseRes.Errors
+        printfn "Checking of file %s aborted because %A" file parseRes.Diagnostics
         None
-    | FSharpCheckFileAnswer.Succeeded(c) -> Some(file, text, parseRes, c)
+    | FSharpCheckFileAnswer.Succeeded (c) -> Some(file, text, parseRes, c)
 
 let entityCache = EntityCache()
 
-let getAllEntities (checkResults: FSharpCheckFileResults) (publicOnly: bool): AssemblySymbol list =
+let getAllEntities (checkResults: FSharpCheckFileResults) (publicOnly: bool) : AssemblySymbol list =
     try
         let res =
-            [ yield! AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full
-                         checkResults.PartialAssemblySignature
+            [ yield!
+                  AssemblyContent.GetAssemblySignatureContent
+                      AssemblyContentType.Full
+                      checkResults.PartialAssemblySignature
               let ctx = checkResults.ProjectContext
 
               let assembliesByFileName =
@@ -64,29 +63,42 @@ let getAllEntities (checkResults: FSharpCheckFileResults) (publicOnly: bool): As
 
               for fileName, signatures in assembliesByFileName do
                   let contentType =
-                      if publicOnly then Public else Full
+                      if publicOnly then
+                          AssemblyContentType.Public
+                      else
+                          AssemblyContentType.Full
 
                   let content =
-                      AssemblyContentProvider.getAssemblyContent entityCache.Locking contentType fileName signatures
+                      AssemblyContent.GetAssemblyContent entityCache.Locking contentType fileName signatures
+
                   yield! content ]
+
         res
-    with _ -> []
+    with
+    | _ -> []
 
 let createContext (file, text: string, p: FSharpParseFileResults, c: FSharpCheckFileResults) =
-    match p.ParseTree, c.ImplementationFile with
-    | Some pt, Some tast ->
+    match c.ImplementationFile with
+    | Some tast ->
         let context: Context =
             { FileName = file
               Content = text.Split([| '\n' |])
-              ParseTree = pt
+              ParseTree = p.ParseTree
               TypedTree = tast
               Symbols = c.PartialAssemblySignature.Entities |> Seq.toList
               GetAllEntities = getAllEntities c }
+
         Some context
     | _ -> None
 
 let context proj =
-    let path = Path.Combine(Environment.CurrentDirectory, proj) |> Path.GetFullPath
+    printfn "proj path is %s" proj
+
+    let path =
+        Path.Combine(Environment.CurrentDirectory, proj)
+        |> Path.GetFullPath
+
+    printfn "Normalised path to %s" path
 
     loadProject path
     |> typeCheckFile

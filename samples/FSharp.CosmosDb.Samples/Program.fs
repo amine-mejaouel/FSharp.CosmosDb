@@ -4,34 +4,7 @@ open FSharp.CosmosDb
 open FSharp.Control
 open Microsoft.Extensions.Configuration
 open System.IO
-
-type Parent =
-    { FamilyName: string
-      FirstName: string }
-
-type Pet = { GivenName: string }
-
-type Child =
-    { FamilyName: string
-      FirstName: string
-      Gender: string
-      Grade: int
-      Pets: Pet array }
-
-type Address =
-    { State: string
-      Country: string
-      City: string }
-
-type Family =
-    { [<Id>]
-      Id: string
-      [<PartitionKey>]
-      LastName: string
-      IsRegistered: bool
-      Parents: Parent array
-      Children: Child array
-      Address: Address }
+open Types
 
 let getFamiliesConnection host key =
     host
@@ -103,13 +76,15 @@ let main argv =
     async {
         let host = config.["CosmosConnection:Host"]
         let key = config.["CosmosConnection:Key"]
-        let conn = getFamiliesConnection host key
+        use conn = getFamiliesConnection host key
 
         // let connectionString =
         //     config.["CosmosConnection:ConnectionString"]
 
         // let conn =
         //     getFamiliesConnectionFromConnString connectionString
+
+        printfn "Getting ready to do some Cosmos operations"
 
         let families =
             [| { Id = "Powell.1"
@@ -148,7 +123,6 @@ let main argv =
         do!
             deletePowell
             |> AsyncSeq.iter (fun f -> printfn "Deleted: %A" f)
-
 
         do!
             conn

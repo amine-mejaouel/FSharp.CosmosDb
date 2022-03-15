@@ -1,9 +1,7 @@
 namespace FSharp.CosmosDb
 
-open Azure.Cosmos
-open FSharp.Control
+open Microsoft.Azure.Cosmos
 open System
-open System.Reflection
 
 [<RequireQualifiedAccess>]
 module Cosmos =
@@ -96,7 +94,6 @@ module Cosmos =
               Id = id
               PartitionKey = partitionKey }
 
-
     // --- READ --- //
 
     let read id partitionKey op =
@@ -112,28 +109,9 @@ module Cosmos =
 
     // --- Execute --- //
 
-    let private getClient connInfo =
-        let clientOps =
-            match connInfo.Options with
-            | Some op -> op
-            | None -> CosmosClientOptions()
+    let private getClient (connInfo: ConnectionOperation) = connInfo.GetClient()
 
-        let client =
-            if connInfo.FromConnectionString then
-                maybe {
-                    let! connStr = connInfo.ConnectionString
-                    return new CosmosClient(connStr, clientOps)
-                }
-            else
-                maybe {
-                    let! host = connInfo.Endpoint
-                    let! accessKey = connInfo.AccessKey
-                    return new CosmosClient(host, accessKey, clientOps)
-                }
-
-        match client with
-        | Some client -> client
-        | None -> failwith "No connection information provided"
+    let dispose (connInfo: ConnectionOperation) = (connInfo :> IDisposable).Dispose()
 
     let execAsync<'T> (op: ContainerOperation<'T>) =
         match op with
@@ -145,7 +123,113 @@ module Cosmos =
         | Read op -> OperationHandling.execRead getClient op
         | Replace op -> OperationHandling.execReplace getClient op
 
-    let execBatchAsync<'T> (op: ContainerOperation<'T>) =
+    let execBatchAsync<'T> batchSize (op: ContainerOperation<'T>) =
         match op with
-        | Query op -> OperationHandling.execQueryBatch getClient op
+        | Query op ->
+            let queryOps = QueryRequestOptions()
+            queryOps.MaxItemCount <- batchSize
+            OperationHandling.execQueryBatch getClient op queryOps
         | _ -> failwith "Batch return operation only supported with query operations, use `execAsync` instead."
+
+    // --- Access Cosmos APIs directly --- //
+
+    [<RequireQualifiedAccess>]
+    module Raw =
+        let client connInfo = getClient connInfo
+
+        let database connInfo =
+            maybe {
+                let client = getClient connInfo
+                let! dbName = connInfo.DatabaseId
+
+                return client.GetDatabase dbName
+            }
+
+        let container connInfo =
+            maybe {
+                let client = getClient connInfo
+                let! dbName = connInfo.DatabaseId
+
+                let db = client.GetDatabase dbName
+
+                let! cn = connInfo.ContainerName
+
+                return db.GetContainer cn
+            }
+
+    [<RequireQualifiedAccess>]
+    module ChangeFeed =
+        let create<'T> processor onChange connInfo : ChangeFeedOptions<'T> =
+            { Processor = processor
+              OnChange = onChange
+              Connection = connInfo
+              LeaseContainer = None
+              InstanceName = None
+              PollingInterval = None
+              StartTime = None
+              MaxItems = None }
+
+        let withInstanceName<'T> name changeFeedInfo : ChangeFeedOptions<'T> =
+            { changeFeedInfo with
+                  InstanceName = Some name }
+
+        let leaseContainer<'T> leaseContainerInfo changeFeedInfo : ChangeFeedOptions<'T> =
+            { changeFeedInfo with
+                  LeaseContainer = Some leaseContainerInfo }
+
+        let pollingInterval<'T> interval changeFeedInfo : ChangeFeedOptions<'T> =
+            { changeFeedInfo with
+                  PollingInterval = Some interval }
+
+        let startTime<'T> startTime changeFeedInfo : ChangeFeedOptions<'T> =
+            { changeFeedInfo with
+                  StartTime = Some startTime }
+
+        let maxItems<'T> maxItems changeFeedInfo : ChangeFeedOptions<'T> =
+            { changeFeedInfo with
+                  MaxItems = Some maxItems }
+
+        let build<'T> changeFeedInfo =
+            let processor =
+                maybe {
+                    let! container = Raw.container changeFeedInfo.Connection
+
+                    return
+                        container.GetChangeFeedProcessorBuilder<'T>(
+                            changeFeedInfo.Processor,
+                            (fun changes cancellationToken -> changeFeedInfo.OnChange changes cancellationToken)
+                        )
+                }
+
+            match processor with
+            | Some processor ->
+                processor
+                |> fun c ->
+                    match changeFeedInfo.InstanceName with
+                    | Some i -> c.WithInstanceName i
+                    | None -> c
+                |> fun c ->
+                    match changeFeedInfo.PollingInterval with
+                    | Some i -> c.WithPollInterval i
+                    | None -> c
+                |> fun c ->
+                    match changeFeedInfo.StartTime with
+                    | Some x -> c.WithStartTime x
+                    | None -> c
+                |> fun c ->
+                    match changeFeedInfo.MaxItems with
+                    | Some x -> c.WithMaxItems x
+                    | None -> c
+                |> ignore
+
+                maybe {
+                    let! leaseContainer = changeFeedInfo.LeaseContainer
+                    let! container = Raw.container leaseContainer
+
+                    return processor.WithLeaseContainer container
+                }
+                |> ignore
+
+                processor.Build()
+            | None ->
+                failwith "Unable to connect the change feed. Ensure the container and lease container info is all set"

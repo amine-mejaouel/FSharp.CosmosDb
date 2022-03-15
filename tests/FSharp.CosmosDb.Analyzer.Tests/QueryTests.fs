@@ -12,8 +12,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   Expect.equal 1 (List.length ops) "Found one operation block"
           }
@@ -22,8 +21,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   let head = List.exactlyOne ops
                   Expect.equal 4 (List.length head.blocks) "Found four things to analyse"
@@ -33,8 +31,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   let head = List.exactlyOne ops
 
@@ -54,8 +51,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   let head = List.exactlyOne ops
 
@@ -75,8 +71,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   let head = List.exactlyOne ops
 
@@ -96,8 +91,7 @@ let tests =
               match context (find "../samples/querySample.fs") with
               | None -> failwith "Could not load test script"
               | Some context ->
-                  let ops =
-                      CosmosCodeAnalysis.findOperations context
+                  let ops = CosmosCodeAnalysis.findOperations context
 
                   let head = List.exactlyOne ops
 

@@ -1,6 +1,27 @@
 # Changelog for `FSharp.CosmosDb`
 
-## [0.5.1] - 2021-04-09
+## [1.0.0] - unreleased
+
+**This release has breaking changes from pre-v1**
+
+### Changed
+
+- Moved away from `Azure.Cosmos` 'V4' SDK to use `Microsoft.Azure.Cosmos` 'V3' SDK
+  - v4 has no GA date and new features land in v3
+- No longer using `AsyncPagable` or `Page<T>` as that was in v4
+- `execBatchAsync` now accepts a batch size so it can properly paginate
+- Updated analyzer dependencies
+- The record representing a connection to Cosmos is now a disposable object
+- Support for .NET 6
+
+### Added
+
+- New APIs for getting the raw SDK version of the CosmosClient, Database and Container
+- New API for working with the Cosmos Change Feed in a F# manner
+- Sample showing how to use the Change Feed, works with the existing sample but can be run standalone
+- New `Cosmos.dispose` method for disposing of a connection (just wraps the call on `ConnectionOperation` for disposable)
+
+## [0.5.2] - 2021-04-09
 
 ### Fixed
 
