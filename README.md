@@ -120,8 +120,7 @@ let findUsers() =
 
 ```f#
 [<EntryPoint>]
-let main argv =
-    async {
+let main argv = async {
         let users = findUsers()
         do! users
         |> AsyncSeq.iter (fun u -> printfn "%s %s" u.FirstName u.LastName)
@@ -154,7 +153,9 @@ open FSharp.CosmosDb
 let connStr = "..."
 
 connStr
-|> Cosmos.container "ContainerName"
+|> Cosmos.fromConnectionString
+|> Cosmos.database "MyDatabase"
+|> Cosmos.container "MyContainer"
 |> Cosmos.createContainer
 |> Cosmos.execAsync
 |> Async.Ignore
@@ -168,7 +169,9 @@ open FSharp.CosmosDb
 let connStr = "..."
 
 connStr
-|> Cosmos.container "ContainerName"
+|> Cosmos.fromConnectionString
+|> Cosmos.database "MyDatabase"
+|> Cosmos.container "MyContainer"
 |> Cosmos.deleteContainer
 |> Cosmos.execAsync
 |> Async.Ignore
