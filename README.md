@@ -22,6 +22,36 @@ dotnet paket add FSharp.CosmosDb
 
 All operations will return an `AsyncSeq` via [FSharp.Control.AsyncSeq](http://fsprojects.github.io/FSharp.Control.AsyncSeq/index.html) that contains the data fetched, data inserted or data updated.
 
+### Create Database
+
+```fsharp
+open FSharp.CosmosDb
+
+let connStr = "..."
+
+let createDatabase =
+    connStr
+    |> Cosmos.fromConnectionString
+    |> Cosmos.database "MyDatabase"
+    |> Cosmos.createDatabase
+    |> Cosmos.execAsync
+```
+
+### Delete Database
+
+```fsharp
+open FSharp.CosmosDb
+
+let connStr = "..."
+
+let deleteDatabase =
+    connStr
+    |> Cosmos.fromConnectionString
+    |> Cosmos.database "MyDatabase"
+    |> Cosmos.deleteDatabase
+    |> Cosmos.execAsync
+```
+
 ### Insert
 
 ```fsharp
