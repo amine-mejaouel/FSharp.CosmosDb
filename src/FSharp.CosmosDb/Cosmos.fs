@@ -54,6 +54,11 @@ module Cosmos =
 
     let parameters arr op =
         { op with QueryOp.Parameters = op.Parameters @ arr }
+        
+    // --- CREATE DATABASE --- //
+        
+    let createDatabase op =
+        { CreateDatabaseOp.Connection = op }
 
     // --- INSERT --- //
 
@@ -90,6 +95,11 @@ module Cosmos =
 
     let deleteContainer<'T> op : DeleteContainerOp<'T> =
         { DeleteContainerOp.Connection = op }
+        
+    // --- DELETE DATABASE --- //
+
+    let deleteDatabase op : DeleteDatabaseOp =
+        { DeleteDatabaseOp.Connection = op }
 
     // --- READ --- //
 
@@ -220,10 +230,12 @@ module Cosmos =
 type Cosmos =
     static member private getClient (connInfo: ConnectionOperation) = connInfo.GetClient()
     static member execAsync (op: QueryOp<'T>) = OperationHandling.execQuery Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateDatabase Cosmos.getClient op
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteContainer Cosmos.getClient op
+    static member execAsync op = OperationHandling.execDeleteDatabase Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execRead Cosmos.getClient op
     static member execAsync op = OperationHandling.execReplace Cosmos.getClient op

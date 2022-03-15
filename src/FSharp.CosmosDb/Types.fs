@@ -86,6 +86,9 @@ type QueryOp<'T> =
     { Connection: ConnectionOperation
       Query: string option
       Parameters: (string * obj) list }
+    
+type CreateDatabaseOp =
+    { Connection: ConnectionOperation }
 
 type InsertOp<'T> =
     { Connection: ConnectionOperation
@@ -107,6 +110,9 @@ type DeleteItemOp<'T> =
       PartitionKey: string }
     
 type DeleteContainerOp<'T> =
+    { Connection: ConnectionOperation }
+    
+type DeleteDatabaseOp =
     { Connection: ConnectionOperation }
 
 type ReadOp<'T> =
