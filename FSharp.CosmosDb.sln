@@ -21,6 +21,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.CosmosDb.Samples", "
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.CosmosDb.Samples.ChangeFeed", "samples\FSharp.CosmosDb.Samples.ChangeFeed\FSharp.CosmosDb.Samples.ChangeFeed.fsproj", "{739EA0E3-4C43-4F94-8756-CEC5E35A45DB}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.CosmosDb.Integration.Tests", "tests\FSharp.CosmosDb.Integration.Tests\FSharp.CosmosDb.Integration.Tests.fsproj", "{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -106,6 +108,18 @@ Global
 		{739EA0E3-4C43-4F94-8756-CEC5E35A45DB}.Release|x64.Build.0 = Release|Any CPU
 		{739EA0E3-4C43-4F94-8756-CEC5E35A45DB}.Release|x86.ActiveCfg = Release|Any CPU
 		{739EA0E3-4C43-4F94-8756-CEC5E35A45DB}.Release|x86.Build.0 = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|x64.Build.0 = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Debug|x86.Build.0 = Debug|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|x64.ActiveCfg = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|x64.Build.0 = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|x86.ActiveCfg = Release|Any CPU
+		{BEB937CD-5A6C-489B-9893-8A88DAA9BCC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8D36DADB-614C-4538-98D3-D3CEF53C5A5B} = {7F327B48-3FBA-463C-94D8-BE3033E8F1A3}
