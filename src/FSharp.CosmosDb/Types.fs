@@ -112,10 +112,13 @@ type DeleteItemOp<'T> =
       Id: string
       PartitionKey: string }
     
-type CreateContainerOp<'T> =
+type CheckIfContainerExistsOp =
     { Connection: ConnectionOperation }
     
-type DeleteContainerOp<'T> =
+type CreateContainerIfNotExistsOp =
+    { Connection: ConnectionOperation }
+    
+type DeleteContainerOp =
     { Connection: ConnectionOperation }
     
 type DeleteDatabaseOp =

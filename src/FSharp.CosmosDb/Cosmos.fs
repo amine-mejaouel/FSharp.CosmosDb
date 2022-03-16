@@ -56,6 +56,7 @@ module Cosmos =
         { op with QueryOp.Parameters = op.Parameters @ arr }
         
     // -- CHECK IF DATABASE EXISTS -- //
+    
     let checkIfDatabaseExists op =
         { CheckIfDatabaseExistsOp.Connection = op }
 
@@ -95,14 +96,18 @@ module Cosmos =
           Id = id
           PartitionKey = partitionKey }
         
+    // -- CHECK IF CONTAINER EXISTS -- //
+    let checkIfContainerExists op =
+        { CheckIfContainerExistsOp.Connection = op }
+        
     // --- CREATE CONTAINER --- //
 
-    let createContainer<'T> op : CreateContainerOp<'T> =
-        { CreateContainerOp.Connection = op }
+    let createContainerIfNotExists op : CreateContainerIfNotExistsOp =
+        { CreateContainerIfNotExistsOp.Connection = op }
         
     // --- DELETE CONTAINER --- //
 
-    let deleteContainer<'T> op : DeleteContainerOp<'T> =
+    let deleteContainer op : DeleteContainerOp =
         { DeleteContainerOp.Connection = op }
         
     // --- DELETE DATABASE --- //
@@ -244,7 +249,8 @@ type Cosmos =
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op
-    static member execAsync op = OperationHandling.execCreateContainer Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCheckIfContainerExists Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateContainerIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteContainer Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteDatabase Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpsert Cosmos.getClient op
