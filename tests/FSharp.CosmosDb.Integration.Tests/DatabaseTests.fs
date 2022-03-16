@@ -1,10 +1,10 @@
 module DatabaseTests
 
+open System
 open Expecto
 open FSharp.CosmosDb
 
-[<Literal>]
-let private connectionString = "AccountEndpoint=https://localhost:8081/;AccountKey=..."
+let private connectionString = Environment.GetEnvironmentVariable("CosmosDbConnectionString")
 
 let databaseExists databaseName = 
     connectionString
