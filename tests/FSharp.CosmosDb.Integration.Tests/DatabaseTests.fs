@@ -4,33 +4,31 @@ open Expecto
 open FSharp.CosmosDb
 
 let databaseExists databaseName = 
-    Common.connectionString
-    |> Cosmos.fromConnectionString
+    IntegrationTests.cosmosConnection
     |> Cosmos.database databaseName
     |> Cosmos.checkIfDatabaseExists
     |> Cosmos.execAsync
-    |> Async.RunSynchronously
     
 let createDatabaseIfNotExists databaseName =
-    Common.connectionString
-    |> Cosmos.fromConnectionString
+    IntegrationTests.cosmosConnection
     |> Cosmos.database databaseName
     |> Cosmos.createDatabaseIfNotExists
     |> Cosmos.execAsync
     |> Async.Ignore
     
 let deleteDatabase databaseName =
-    Common.connectionString
-    |> Cosmos.fromConnectionString
+    IntegrationTests.cosmosConnection
     |> Cosmos.database databaseName
     |> Cosmos.deleteDatabase
     |> Cosmos.execAsync
     |> Async.Ignore
     
 let deleteDatabaseIfExists databaseName =
-    if databaseExists databaseName then
-        deleteDatabase databaseName
-        |> ignore
+    async {
+        let! exists = databaseExists databaseName
+        if exists then
+            do! deleteDatabase databaseName
+    }
     
 [<Tests>]
 let tests =
@@ -40,14 +38,15 @@ let tests =
         
             //Arrange
             let dataBaseName = "DatabaseToCreate"
-            deleteDatabaseIfExists dataBaseName
+            do! deleteDatabaseIfExists dataBaseName
             
             //Act
             do! createDatabaseIfNotExists dataBaseName
             
             //Assert
+            let! databaseExists = databaseExists dataBaseName
             Expect.isTrue
-                 (databaseExists dataBaseName)
+                 databaseExists
                  "databaseCreate should create the database" }
         
           testAsync "deleteDatabase should delete the database if it exists" {
@@ -60,8 +59,9 @@ let tests =
             do! deleteDatabase databaseName
             
             //Assert
+            let! databaseExists = databaseExists databaseName
             Expect.isFalse
-                 (databaseExists databaseName)
+                 databaseExists
                  "databaseCreate should delete the database" }
          ]
 

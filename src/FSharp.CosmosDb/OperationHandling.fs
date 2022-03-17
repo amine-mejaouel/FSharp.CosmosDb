@@ -256,7 +256,7 @@ let execDeleteItem (getClient: ConnectionOperation -> CosmosClient) (op: DeleteI
 
     | None -> failwith "Unable to read from the container to get the item for updating"
     
-let execCheckIfContainerExists (getClient: ConnectionOperation -> CosmosClient) (op: CheckIfContainerExistsOp) =
+let execGetContainerProperties (getClient: ConnectionOperation -> CosmosClient) (op: GetContainerPropertiesOp) =
     let connInfo = op.Connection
     let client = getClient connInfo
     
@@ -285,7 +285,15 @@ let execCheckIfContainerExists (getClient: ConnectionOperation -> CosmosClient) 
             for x in c do
                 yield x
         })
-    |> AsyncSeq.exists (fun i -> i.Id = containerName)
+    |> AsyncSeq.tryFind (fun i -> i.Id = containerName)
+    
+let execCheckIfContainerExists (getClient: ConnectionOperation -> CosmosClient) (op: CheckIfContainerExistsOp) =
+    async {
+        let! containerProperties = execGetContainerProperties getClient { Connection= op.Connection }
+        
+        return containerProperties
+               |> Option.isSome
+    }
     
 let execCreateContainerIfNotExists (getClient: ConnectionOperation -> CosmosClient) (op: CreateContainerIfNotExistsOp) =
     let connInfo = op.Connection
@@ -298,7 +306,7 @@ let execCreateContainerIfNotExists (getClient: ConnectionOperation -> CosmosClie
 
             let db = client.GetDatabase databaseId
 
-            let containerCreation = db.CreateContainerIfNotExistsAsync(containerName, "/id")
+            let containerCreation = db.CreateContainerIfNotExistsAsync(containerName, op.PartitionKey)
 
             return
                 containerCreation

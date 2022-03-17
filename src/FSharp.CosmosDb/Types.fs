@@ -112,11 +112,15 @@ type DeleteItemOp<'T> =
       Id: string
       PartitionKey: string }
     
+type GetContainerPropertiesOp = 
+    { Connection: ConnectionOperation }
+    
 type CheckIfContainerExistsOp =
     { Connection: ConnectionOperation }
     
 type CreateContainerIfNotExistsOp =
-    { Connection: ConnectionOperation }
+    { Connection: ConnectionOperation
+      PartitionKey: string }
     
 type DeleteContainerOp =
     { Connection: ConnectionOperation }

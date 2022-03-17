@@ -96,14 +96,19 @@ module Cosmos =
           Id = id
           PartitionKey = partitionKey }
         
+    // -- GET CONTAINER PROPERTIES -- //
+    let getContainerProperties op =
+        { GetContainerPropertiesOp.Connection = op }
+        
     // -- CHECK IF CONTAINER EXISTS -- //
     let checkIfContainerExists op =
         { CheckIfContainerExistsOp.Connection = op }
         
     // --- CREATE CONTAINER --- //
 
-    let createContainerIfNotExists op : CreateContainerIfNotExistsOp =
-        { CreateContainerIfNotExistsOp.Connection = op }
+    let createContainerIfNotExists partitionKey op : CreateContainerIfNotExistsOp =
+        { CreateContainerIfNotExistsOp.Connection = op
+          PartitionKey = partitionKey }
         
     // --- DELETE CONTAINER --- //
 
@@ -249,6 +254,7 @@ type Cosmos =
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op
+    static member execAsync op = OperationHandling.execGetContainerProperties Cosmos.getClient op
     static member execAsync op = OperationHandling.execCheckIfContainerExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execCreateContainerIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteContainer Cosmos.getClient op
