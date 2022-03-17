@@ -1,14 +1,12 @@
 module ContainerTests
 
-open System
 open Expecto
 open FSharp.CosmosDb
 
-let private connectionString = Environment.GetEnvironmentVariable("CosmosDbConnectionString")
 let private databaseName = "DatabaseForContainerTests"
 
 let containerExists containerName = 
-    connectionString
+    Common.connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database databaseName
     |> Cosmos.container containerName
@@ -17,55 +15,50 @@ let containerExists containerName =
     |> Async.RunSynchronously
     
 let createContainerIfNotExists containerName =
-    connectionString
+    Common.connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database databaseName
     |> Cosmos.container containerName
     |> Cosmos.createContainerIfNotExists
     |> Cosmos.execAsync
-    |> Async.RunSynchronously
-    |> ignore
+    |> Async.Ignore
     
 [<Tests>]
 let tests =
     testList
         "Container"
-        [ test "createContainer should create a container if it does not exists" {
+        [ testAsync "createContainer should create a container if it does not exists" {
             let containerName = "MyContainer"
             
-            DatabaseTests.createDatabaseIfNotExists databaseName
-            |> ignore
+            do! DatabaseTests.createDatabaseIfNotExists databaseName
             
-            connectionString
-            |> Cosmos.fromConnectionString
-            |> Cosmos.database databaseName
-            |> Cosmos.container containerName
-            |> Cosmos.createContainerIfNotExists
-            |> Cosmos.execAsync
-            |> Async.RunSynchronously
-            |> ignore
+            do! Common.connectionString
+                |> Cosmos.fromConnectionString
+                |> Cosmos.database databaseName
+                |> Cosmos.container containerName
+                |> Cosmos.createContainerIfNotExists
+                |> Cosmos.execAsync
+                |> Async.Ignore
             
             Expect.isTrue
                  (containerExists containerName)
                  "createContainer should create the container" }
         
-          test "deleteContainer should delete the container" {
+          testAsync "deleteContainer should delete the container" {
             let containerName = "ContainerToDelete"
             
             DatabaseTests.createDatabaseIfNotExists databaseName
             |> ignore
             
-            createContainerIfNotExists containerName
-            |> ignore
+            do! createContainerIfNotExists containerName
             
-            connectionString
-            |> Cosmos.fromConnectionString
-            |> Cosmos.database databaseName
-            |> Cosmos.container containerName
-            |> Cosmos.deleteContainer
-            |> Cosmos.execAsync
-            |> Async.RunSynchronously
-            |> ignore
+            do! Common.connectionString
+                |> Cosmos.fromConnectionString
+                |> Cosmos.database databaseName
+                |> Cosmos.container containerName
+                |> Cosmos.deleteContainer
+                |> Cosmos.execAsync
+                |> Async.Ignore
             
             Expect.isFalse
                  (containerExists containerName)

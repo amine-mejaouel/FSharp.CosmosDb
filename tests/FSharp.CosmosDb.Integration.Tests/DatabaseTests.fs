@@ -1,13 +1,10 @@
 module DatabaseTests
 
-open System
 open Expecto
 open FSharp.CosmosDb
 
-let private connectionString = Environment.GetEnvironmentVariable("CosmosDbConnectionString")
-
 let databaseExists databaseName = 
-    connectionString
+    Common.connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database databaseName
     |> Cosmos.checkIfDatabaseExists
@@ -15,7 +12,7 @@ let databaseExists databaseName =
     |> Async.RunSynchronously
     
 let createDatabaseIfNotExists databaseName =
-    connectionString
+    Common.connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database databaseName
     |> Cosmos.createDatabaseIfNotExists
@@ -23,7 +20,7 @@ let createDatabaseIfNotExists databaseName =
     |> Async.Ignore
     
 let deleteDatabase databaseName =
-    connectionString
+    Common.connectionString
     |> Cosmos.fromConnectionString
     |> Cosmos.database databaseName
     |> Cosmos.deleteDatabase
