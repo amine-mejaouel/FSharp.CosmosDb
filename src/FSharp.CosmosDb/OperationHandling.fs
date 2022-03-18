@@ -339,6 +339,14 @@ let execDeleteContainer (getClient: ConnectionOperation -> CosmosClient) (op: De
     | Some result -> result
     | None -> failwith "Unable to delete container"
     
+let execDeleteContainerIfExists (getClient: ConnectionOperation -> CosmosClient) (op: DeleteContainerIfExistsOp) =
+    async {
+        let! exists = execCheckIfDatabaseExists getClient { Connection= op.Connection }
+        if exists then
+            do! execDeleteContainer getClient { Connection= op.Connection }
+                |> Async.Ignore
+    }
+    
 let execDeleteDatabase (getClient: ConnectionOperation -> CosmosClient) (op: DeleteDatabaseOp) =
     let connInfo = op.Connection
     let client = getClient connInfo

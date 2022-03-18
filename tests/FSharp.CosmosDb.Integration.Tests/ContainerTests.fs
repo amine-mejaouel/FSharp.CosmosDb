@@ -29,11 +29,12 @@ let deleteContainer containerName =
     |> Async.Ignore
     
 let deleteContainerIfExists containerName =
-    async {
-        let! exists = containerExists containerName
-        if exists then
-            do! deleteContainer containerName
-    }
+    IntegrationTests.cosmosConnection
+    |> Cosmos.database databaseName
+    |> Cosmos.container containerName
+    |> Cosmos.deleteContainerIfExists
+    |> Cosmos.execAsync
+    |> Async.Ignore
     
 [<Tests>]
 let tests =
@@ -105,7 +106,3 @@ let tests =
                  partitionKey
                  "createContainer should create the container with correct Partition Key" }
          ]
-
-//TODO: refactor setup method for DatabaseTests and ContainerTests
-//TODO: move created helper method used in test into the library code
-//TODO: For next step simplify the API, you know each operation is going through many Cosmos.... lines

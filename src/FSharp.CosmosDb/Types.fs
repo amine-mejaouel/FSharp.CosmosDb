@@ -125,6 +125,9 @@ type CreateContainerIfNotExistsOp =
 type DeleteContainerOp =
     { Connection: ConnectionOperation }
     
+type DeleteContainerIfExistsOp =
+    { Connection: ConnectionOperation }
+    
 type DeleteDatabaseOp =
     { Connection: ConnectionOperation }
 

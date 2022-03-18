@@ -115,6 +115,11 @@ module Cosmos =
     let deleteContainer op : DeleteContainerOp =
         { DeleteContainerOp.Connection = op }
         
+    // --- DELETE CONTAINER IF EXISTS --- //
+
+    let deleteContainerIfExists op : DeleteContainerIfExistsOp =
+        { DeleteContainerIfExistsOp.Connection = op }
+        
     // --- DELETE DATABASE --- //
 
     let deleteDatabase op : DeleteDatabaseOp =
@@ -254,10 +259,11 @@ type Cosmos =
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op
+    static member execAsync op = OperationHandling.execDeleteContainerIfExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execGetContainerProperties Cosmos.getClient op
     static member execAsync op = OperationHandling.execCheckIfContainerExists Cosmos.getClient op
-    static member execAsync op = OperationHandling.execCreateContainerIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteContainer Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateContainerIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteDatabase Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execRead Cosmos.getClient op
