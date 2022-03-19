@@ -97,7 +97,7 @@ let execCreateDatabaseIfNotExists (getClient: ConnectionOperation -> CosmosClien
     let result =
         maybe {
             let! database = connInfo.DatabaseId
-            
+
             return client.CreateDatabaseIfNotExistsAsync(database)
             |> Async.AwaitTask
         }
@@ -338,7 +338,7 @@ let execDeleteContainer (getClient: ConnectionOperation -> CosmosClient) (op: De
     match result with
     | Some result -> result
     | None -> failwith "Unable to delete container"
-    
+
 let execDeleteContainerIfExists (getClient: ConnectionOperation -> CosmosClient) (op: DeleteContainerIfExistsOp) =
     async {
         let! exists = execCheckIfDatabaseExists getClient { Connection= op.Connection }
@@ -346,7 +346,7 @@ let execDeleteContainerIfExists (getClient: ConnectionOperation -> CosmosClient)
             do! execDeleteContainer getClient { Connection= op.Connection }
                 |> Async.Ignore
     }
-    
+
 let execDeleteDatabase (getClient: ConnectionOperation -> CosmosClient) (op: DeleteDatabaseOp) =
     let connInfo = op.Connection
     let client = getClient connInfo

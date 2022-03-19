@@ -9,6 +9,7 @@
     <Compile Include="insertSample.fs" />
     <Compile Include="simpleSample.fs" />
     <Compile Include="querySample.fs" />
+    <Compile Include="createDeleteDatabaseSample.fs" />
     <Compile Include="createDeleteContainerSample.fs" />
     <Compile Include="createDeleteDatabaseSample.fs" />
   </ItemGroup>

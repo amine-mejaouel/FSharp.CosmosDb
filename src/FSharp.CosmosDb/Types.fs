@@ -86,7 +86,7 @@ type QueryOp<'T> =
     { Connection: ConnectionOperation
       Query: string option
       Parameters: (string * obj) list }
-    
+
 type CheckIfDatabaseExistsOp =
     { Connection: ConnectionOperation }
     
@@ -126,6 +126,9 @@ type DeleteContainerOp =
     { Connection: ConnectionOperation }
     
 type DeleteContainerIfExistsOp =
+    { Connection: ConnectionOperation }
+    
+type DeleteDatabaseOp =
     { Connection: ConnectionOperation }
     
 type DeleteDatabaseOp =

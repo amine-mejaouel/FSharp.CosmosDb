@@ -114,12 +114,12 @@ module Cosmos =
 
     let deleteContainer op : DeleteContainerOp =
         { DeleteContainerOp.Connection = op }
-        
+
     // --- DELETE CONTAINER IF EXISTS --- //
 
     let deleteContainerIfExists op : DeleteContainerIfExistsOp =
         { DeleteContainerIfExistsOp.Connection = op }
-        
+
     // --- DELETE DATABASE --- //
 
     let deleteDatabase op : DeleteDatabaseOp =
