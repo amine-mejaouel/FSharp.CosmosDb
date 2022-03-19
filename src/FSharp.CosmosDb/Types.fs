@@ -131,9 +131,6 @@ type DeleteContainerIfExistsOp =
 type DeleteDatabaseOp =
     { Connection: ConnectionOperation }
     
-type DeleteDatabaseOp =
-    { Connection: ConnectionOperation }
-
 type ReadOp<'T> =
     { Connection: ConnectionOperation
       Id: string
