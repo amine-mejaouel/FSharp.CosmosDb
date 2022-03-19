@@ -86,8 +86,11 @@ type QueryOp<'T> =
     { Connection: ConnectionOperation
       Query: string option
       Parameters: (string * obj) list }
+
+type CheckIfDatabaseExistsOp =
+    { Connection: ConnectionOperation }
     
-type CreateDatabaseOp =
+type CreateDatabaseIfNotExistsOp =
     { Connection: ConnectionOperation }
 
 type InsertOp<'T> =
@@ -109,10 +112,23 @@ type DeleteItemOp<'T> =
       Id: string
       PartitionKey: string }
     
-type CreateContainerOp<'T> =
+type GetContainerPropertiesOp = 
     { Connection: ConnectionOperation }
     
-type DeleteContainerOp<'T> =
+type CheckIfContainerExistsOp =
+    { Connection: ConnectionOperation }
+    
+type CreateContainerIfNotExistsOp =
+    { Connection: ConnectionOperation
+      PartitionKey: string }
+    
+type DeleteContainerOp =
+    { Connection: ConnectionOperation }
+    
+type DeleteContainerIfExistsOp =
+    { Connection: ConnectionOperation }
+    
+type DeleteDatabaseOp =
     { Connection: ConnectionOperation }
     
 type DeleteDatabaseOp =

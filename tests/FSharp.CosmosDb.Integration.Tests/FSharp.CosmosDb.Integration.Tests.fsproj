@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <RootNamespace>FSharp.CosmosDb.Integration.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="paket.references" />
+    <Compile Include="IntegrationTests.fs" />
+    <Compile Include="DatabaseTests.fs" />
+    <Compile Include="ContainerTests.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FSharp.CosmosDb\FSharp.CosmosDb.fsproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

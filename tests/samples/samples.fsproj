@@ -11,6 +11,7 @@
     <Compile Include="querySample.fs" />
     <Compile Include="createDeleteDatabaseSample.fs" />
     <Compile Include="createDeleteContainerSample.fs" />
+    <Compile Include="createDeleteDatabaseSample.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

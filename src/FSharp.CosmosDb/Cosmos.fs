@@ -39,7 +39,7 @@ module Cosmos =
     let database dbId op = { op with DatabaseId = Some dbId }
 
     let container cn op = { op with ContainerName = Some cn }
-
+    
     // --- QUERY --- //
 
     let private defaultQueryOp () =
@@ -55,10 +55,15 @@ module Cosmos =
     let parameters arr op =
         { op with QueryOp.Parameters = op.Parameters @ arr }
         
-    // --- CREATE DATABASE --- //
+    // -- CHECK IF DATABASE EXISTS -- //
+    
+    let checkIfDatabaseExists op =
+        { CheckIfDatabaseExistsOp.Connection = op }
+
+    // --- CREATE DATABASE IF NOT EXISTS --- //
         
-    let createDatabase op =
-        { CreateDatabaseOp.Connection = op }
+    let createDatabaseIfNotExists op =
+        { CreateDatabaseIfNotExistsOp.Connection = op }
 
     // --- INSERT --- //
 
@@ -91,16 +96,30 @@ module Cosmos =
           Id = id
           PartitionKey = partitionKey }
         
+    // -- GET CONTAINER PROPERTIES -- //
+    let getContainerProperties op =
+        { GetContainerPropertiesOp.Connection = op }
+        
+    // -- CHECK IF CONTAINER EXISTS -- //
+    let checkIfContainerExists op =
+        { CheckIfContainerExistsOp.Connection = op }
+        
     // --- CREATE CONTAINER --- //
 
-    let createContainer<'T> op : CreateContainerOp<'T> =
-        { CreateContainerOp.Connection = op }
+    let createContainerIfNotExists partitionKey op : CreateContainerIfNotExistsOp =
+        { CreateContainerIfNotExistsOp.Connection = op
+          PartitionKey = partitionKey }
         
     // --- DELETE CONTAINER --- //
 
-    let deleteContainer<'T> op : DeleteContainerOp<'T> =
+    let deleteContainer op : DeleteContainerOp =
         { DeleteContainerOp.Connection = op }
-        
+
+    // --- DELETE CONTAINER IF EXISTS --- //
+
+    let deleteContainerIfExists op : DeleteContainerIfExistsOp =
+        { DeleteContainerIfExistsOp.Connection = op }
+
     // --- DELETE DATABASE --- //
 
     let deleteDatabase op : DeleteDatabaseOp =
@@ -235,12 +254,16 @@ module Cosmos =
 type Cosmos =
     static member private getClient (connInfo: ConnectionOperation) = connInfo.GetClient()
     static member execAsync (op: QueryOp<'T>) = OperationHandling.execQuery Cosmos.getClient op
-    static member execAsync op = OperationHandling.execCreateDatabase Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCheckIfDatabaseExists Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateDatabaseIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execInsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpdate Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteItem Cosmos.getClient op
-    static member execAsync op = OperationHandling.execCreateContainer Cosmos.getClient op
+    static member execAsync op = OperationHandling.execDeleteContainerIfExists Cosmos.getClient op
+    static member execAsync op = OperationHandling.execGetContainerProperties Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCheckIfContainerExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteContainer Cosmos.getClient op
+    static member execAsync op = OperationHandling.execCreateContainerIfNotExists Cosmos.getClient op
     static member execAsync op = OperationHandling.execDeleteDatabase Cosmos.getClient op
     static member execAsync op = OperationHandling.execUpsert Cosmos.getClient op
     static member execAsync op = OperationHandling.execRead Cosmos.getClient op
